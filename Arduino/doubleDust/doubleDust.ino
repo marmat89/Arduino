@@ -4,7 +4,7 @@
 */
   
 int measurePin = 0; //Connect dust sensor to Arduino A0 pin
-int ledPower = 2;   //Connect 3 led driver pins of dust sensor to Arduino D2
+int ledPower = 12;   //Connect 3 led driver pins of dust sensor to Arduino D2
   
 int samplingTime = 280;
 int deltaTime = 40;
@@ -23,7 +23,9 @@ float dustDensity = 0;
  Written April 2012
  */
  
-int pin = 9;
+int pin2 = 11;
+int pin1 = 9;
+
 unsigned long duration;
 unsigned long starttime;
 unsigned long sampletime_ms = 30000;
@@ -84,7 +86,7 @@ void Shinyei() {
    while ((millis()-starttime) < sampletime_ms )
   {
   
-  duration = pulseIn(pin, LOW);
+  duration = pulseIn(pin1, LOW);
   lowpulseoccupancy = lowpulseoccupancy+duration;
   
   
@@ -96,6 +98,30 @@ void Shinyei() {
     
   }
   Serial.print("Shinyei");
+    Serial.print("-");
+    Serial.print(ratio);
+    Serial.print("-");
+    Serial.println(concentration);
+    lowpulseoccupancy = 0;
+    starttime = millis();
+}
+
+void Shinyei2() {
+   while ((millis()-starttime) < sampletime_ms )
+  {
+  
+  duration = pulseIn(pin2, LOW);
+  lowpulseoccupancy = lowpulseoccupancy+duration;
+  
+  
+ 
+    ratio = lowpulseoccupancy/((millis()-starttime)*10.0);  // Integer percentage 0=>100
+    concentration = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // using spec sheet curve
+     /* convert into concentration in particles per 0.01 cft */
+    //concentration = 1.438e5 * pow(ratio, 2.0) + 4.488e4 * ratio;
+    
+  }
+  Serial.print("Shinyei2.5");
     Serial.print("-");
     Serial.print(ratio);
     Serial.print("-");
