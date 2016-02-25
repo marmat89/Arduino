@@ -57,9 +57,9 @@ void shinyei05(){
       ratio = lowpulseoccupancy/((millis()-starttime)*10.0);  // Integer percentage 0=>100
       dustDensity = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // using spec sheet curve
        /* convert into concentration in particles per 0.01 cft */
-      //dustDensity = 1.438e5 * pow(ratio, 2.0) + 4.488e4 * ratio;
+      dustDensity = 1.438e5 * pow(ratio, 2.0) + 4.488e4 * ratio;
       calcVoltage=(dustDensity/120000)+0.0256;
-      dustDensityMG = (0.172 * calcVoltage - 0.00999);
+      //dustDensityMG = (0.172 * calcVoltage - 0.00999);
       if (ratio>0)
         {
         delay(1000);              // wait for a second
@@ -86,6 +86,7 @@ void shinyei05(){
         Serial.println(errorCount);
         blinkLed(led_red_measure,100,5);
       }
+      float dustDensity=1;
       lowpulseoccupancy = 0;
       starttime = millis();
     }
@@ -108,9 +109,9 @@ void shinyei25(){
       ratio = lowpulseoccupancy/((millis()-starttime)*10.0);  // Integer percentage 0=>100
       dustDensity = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // using spec sheet curve
        /* convert into concentration in particles per 0.01 cft */
-      //dustDensity = 1.438e5 * pow(ratio, 2.0) + 4.488e4 * ratio;
+      dustDensity = 1.438e5 * pow(ratio, 2.0) + 4.488e4 * ratio;
       calcVoltage=(dustDensity/120000)+0.0256;
-      dustDensityMG = (0.172 * calcVoltage - 0.00999);
+      //dustDensityMG = (0.172 * calcVoltage - 0.00999);
       if (ratio>0)
         {
         delay(1000);              // wait for a second
@@ -137,6 +138,7 @@ void shinyei25(){
         Serial.println(errorCount);
         blinkLed(led_red_measure,100,5);
       }
+      float dustDensity=1;
       lowpulseoccupancy = 0;
       starttime = millis();
     }
