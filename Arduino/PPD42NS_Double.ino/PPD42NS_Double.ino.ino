@@ -11,9 +11,10 @@
  JST Pin 4 (Yellow wire) => Arduino Digital Pin 8
  */
 
-int pin = 9;
+int pin25 = 11;
+int pin05 = 9;
 
-unsigned long sampletime_ms = 10000;
+unsigned long sampletime_ms = 30000;
 unsigned long duration;
 unsigned long starttime;
 unsigned long lowpulseoccupancy = 0;
@@ -32,21 +33,23 @@ void setup() {
   starttime = millis();
   pinMode(led_blu_measure, OUTPUT);
   pinMode(led_red_measure, OUTPUT);
-  pinMode(9,INPUT);
+  pinMode(pin05,INPUT);
+  pinMode(pin25,INPUT);
 }
 
 void loop() {
-  shinyei();
+  shinyei05();
+  shinyei25();
   }
 
-void shinyei(){
+void shinyei05(){
   
   float dustDensity=0;
   float dustDensityMG=0;
   float calcVoltage = 0;
   float ratio = 0;
   while (dustDensity==0){
-  duration = pulseIn(pin, LOW);
+  duration = pulseIn(pin05, LOW);
   lowpulseoccupancy = lowpulseoccupancy+duration;
   blinkLed(led_blu_measure,20,1);
   if ((millis()-starttime) > sampletime_ms )
@@ -77,6 +80,57 @@ void shinyei(){
         Serial.print("ERROR");
         Serial.print('&');
         Serial.print("Shinyei_PM_05");
+        Serial.print('&');
+        Serial.print("001_negative voltage");
+        Serial.print('&');
+        Serial.println(errorCount);
+        blinkLed(led_red_measure,100,5);
+      }
+      lowpulseoccupancy = 0;
+      starttime = millis();
+    }
+  }
+}
+
+
+void shinyei25(){
+  
+  float dustDensity=0;
+  float dustDensityMG=0;
+  float calcVoltage = 0;
+  float ratio = 0;
+  while (dustDensity==0){
+  duration = pulseIn(pin05, LOW);
+  lowpulseoccupancy = lowpulseoccupancy+duration;
+  blinkLed(led_blu_measure,20,1);
+  if ((millis()-starttime) > sampletime_ms )
+    {
+      ratio = lowpulseoccupancy/((millis()-starttime)*10.0);  // Integer percentage 0=>100
+      dustDensity = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // using spec sheet curve
+       /* convert into concentration in particles per 0.01 cft */
+      //dustDensity = 1.438e5 * pow(ratio, 2.0) + 4.488e4 * ratio;
+      calcVoltage=(dustDensity/120000)+0.0256;
+      dustDensityMG = (0.172 * calcVoltage - 0.00999);
+      if (ratio>0)
+        {
+        delay(1000);              // wait for a second
+        blinkLed(led_blu_measure,100,5);
+        successCount++;
+        Serial.print("Shinyei_PM_25");
+        Serial.print('&');
+        printDouble(calcVoltage,4);
+        Serial.print('&');
+        Serial.print((float)dustDensity);
+        Serial.print('&');
+        printDouble((float)dustDensityMG,8);
+        Serial.print('&');
+        Serial.println(successCount);
+      }else{
+        delay(1000);              // wait for a second
+        errorCount++;
+        Serial.print("ERROR");
+        Serial.print('&');
+        Serial.print("Shinyei_PM_25");
         Serial.print('&');
         Serial.print("001_negative voltage");
         Serial.print('&');
