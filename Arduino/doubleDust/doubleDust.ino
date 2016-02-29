@@ -7,7 +7,7 @@
 int pin25 = 11;
 int pin05 = 9;
 
-unsigned long sampletime_ms = 20000;
+unsigned long sampletime_ms = 10000;
 unsigned long duration;
 unsigned long starttime;
 unsigned long lowpulseoccupancy = 0;
@@ -17,11 +17,13 @@ int measurePin = 0; //Connect dust sensor to Arduino A0 pin
 int ledPower = 12;   //Connect 3 led driver pins of dust sensor to Arduino 12 pin
 
 //SET PIN : Used for blinking control led
-int led_blu_measure =7; //  Connect led Blue led to 7 pin ON used during measue BLINK if error calc
+int led_white_measure =8; //  Connect led Blue led to 7 pin ON used during measue BLINK if error calc
 int led_red_measure =6; //  Connect led function to 13 pin
- 
+int led_blu_measure =4; //  Connect led Blue led to 7 pin ON used during measue BLINK if error calc
+int led_yellow_measure =5; //  Connect led Blue led to 7 pin ON used during measue BLINK if error calc
+
 //AVG : Number of time for more accurate measure
-int MEASURE_LENGTH=20; 
+int MEASURE_LENGTH=10; 
 int count=0;
 
 //COUNTER : count of succes and error 
@@ -39,6 +41,8 @@ void setup(){
   pinMode(ledPower,OUTPUT);
   pinMode(led_blu_measure, OUTPUT);
   pinMode(led_red_measure, OUTPUT);
+  pinMode(led_white_measure, OUTPUT);
+  pinMode(led_yellow_measure, OUTPUT);
   
   pinMode(pin05,INPUT);
   pinMode(pin25,INPUT);
@@ -62,19 +66,19 @@ void shinyei05(){
   while (dustDensity==0){
   duration = pulseIn(pin05, LOW);
   lowpulseoccupancy = lowpulseoccupancy+duration;
-  blinkLed(led_blu_measure,20,1);
+  blinkLed(led_red_measure,20,1);
   if ((millis()-starttime) > sampletime_ms )
     {
       ratio = lowpulseoccupancy/((millis()-starttime)*10.0);  // Integer percentage 0=>100
-      dustDensity = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // using spec sheet curve
+      //dustDensity = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // using spec sheet curve
        /* convert into concentration in particles per 0.01 cft */
-      //dustDensity = 1.438e5 * pow(ratio, 2.0) + 4.488e4 * ratio;
+      dustDensity = (1.438e5 * pow(ratio, 2.0) + 4.488e4 * ratio)/10;
       calcVoltage=(dustDensity/120000)+0.0256;
       dustDensityMG = (0.172 * calcVoltage - 0.00999);
       if (ratio>0)
         {
         delay(1000);              // wait for a second
-        blinkLed(led_blu_measure,100,5);
+        blinkLed(led_yellow_measure,100,5);
         successCount05++;
         Serial.print("Shinyei_PM_05");
         Serial.print('&');
@@ -95,7 +99,7 @@ void shinyei05(){
         Serial.print("001_negative voltage");
         Serial.print('&');
         Serial.println(errorCount05);
-        blinkLed(led_red_measure,100,5);
+        blinkLed(led_yellow_measure,1000,1);
       }
       float dustDensity=1;
       lowpulseoccupancy = 0;
@@ -118,15 +122,15 @@ void shinyei25(){
   if ((millis()-starttime) > sampletime_ms )
     {
       ratio = lowpulseoccupancy/((millis()-starttime)*10.0);  // Integer percentage 0=>100
-      dustDensity = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // using spec sheet curve
+      //dustDensity = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // using spec sheet curve
        /* convert into concentration in particles per 0.01 cft */
-      //dustDensity = 1.438e5 * pow(ratio, 2.0) + 4.488e4 * ratio;
+      dustDensity = (1.438e5 * pow(ratio, 2.0) + 4.488e4 * ratio)/10;
       calcVoltage=(dustDensity/120000)+0.0256;
       dustDensityMG = (0.172 * calcVoltage - 0.00999);
       if (ratio>0)
         {
         delay(1000);              // wait for a second
-        blinkLed(led_blu_measure,100,5);
+        blinkLed(led_yellow_measure,100,5);
         successCount25++;
         Serial.print("Shinyei_PM_25");
         Serial.print('&');
@@ -147,7 +151,7 @@ void shinyei25(){
         Serial.print("001_negative voltage");
         Serial.print('&');
         Serial.println(errorCount25);
-        blinkLed(led_red_measure,100,5);
+        blinkLed(led_yellow_measure,1000,1);
       }
       float dustDensity=1;
       lowpulseoccupancy = 0;
@@ -174,13 +178,13 @@ void sharp(){
   
   while(count<MEASURE_LENGTH)
   {
-    digitalWrite(led_red_measure,HIGH); // power on the LED
+    
+    blinkLed(led_white_measure,200,1);
     digitalWrite(ledPower,LOW); // power on the LED
     delayMicroseconds(samplingTime);
     voMeasured = analogRead(measurePin); // read the dust value
     delayMicroseconds(deltaTime);
     digitalWrite(ledPower,HIGH); // turn the LED off
-    digitalWrite(led_red_measure,LOW); // power on the LED
     delayMicroseconds(sleepTime);
    
     // 0 - 5V mapped to 0 - 1023 integer values
@@ -198,7 +202,7 @@ void sharp(){
   }
   if (dustDensity/count>=0)
   {
-    blinkLed(led_blu_measure,100,5);
+    blinkLed(led_yellow_measure,100,5);
     successCount++;
     Serial.print("Sharp_PM_1");
     Serial.print('&');
@@ -218,7 +222,7 @@ void sharp(){
     Serial.print("001_negative voltage");
     Serial.print('&');
     Serial.println(errorCount);
-    blinkLed(led_red_measure,100,5);
+        blinkLed(led_yellow_measure,1000,1);
   }
     dustDensity=0;
     dustDensityMG=0;
