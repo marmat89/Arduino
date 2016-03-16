@@ -70,10 +70,10 @@ void shinyei05(){
   if ((millis()-starttime) > sampletime_ms )
     {
       ratio = lowpulseoccupancy/((millis()-starttime)*10.0);  // Integer percentage 0=>100
-      //dustDensity = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // using spec sheet curve
+      dustDensity = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // using spec sheet curve
        /* convert into concentration in particles per 0.01 cft */
-      dustDensity = (1.438e5 * pow(ratio, 2.0) + 4.488e4 * ratio)/10;
-      calcVoltage=(dustDensity/120000)+0.0256;
+      //dustDensity = (1.438e5 * pow(ratio, 2.0) + 4.488e4 * ratio)/10;
+      calcVoltage=(dustDensity/1200)+0.0256;
       dustDensityMG = (0.172 * calcVoltage - 0.00999);
       if (ratio>0)
         {
@@ -122,10 +122,10 @@ void shinyei25(){
   if ((millis()-starttime) > sampletime_ms )
     {
       ratio = lowpulseoccupancy/((millis()-starttime)*10.0);  // Integer percentage 0=>100
-      //dustDensity = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // using spec sheet curve
+      dustDensity = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // using spec sheet curve
        /* convert into concentration in particles per 0.01 cft */
-      dustDensity = (1.438e5 * pow(ratio, 2.0) + 4.488e4 * ratio)/10;
-      calcVoltage=(dustDensity/120000)+0.0256;
+      //dustDensity = (1.438e5 * pow(ratio, 2.0) + 4.488e4 * ratio)/10;
+      calcVoltage=(dustDensity/1200)+0.0256;
       dustDensityMG = (0.172 * calcVoltage - 0.00999);
       if (ratio>0)
         {
@@ -195,7 +195,7 @@ void sharp(){
     // Chris Nafis (c) 2012
 
     dustDensityMG += (0.172 * calcVoltage - 0.00999);
-    dustDensity+=(calcVoltage-0.0256)*120000; //mg/m^3
+    dustDensity+=(calcVoltage-0.0256)*1200; //mg/m^3
     voltage+=calcVoltage;
     count++;
     delay(1000);

@@ -74,7 +74,7 @@ void sharp(){
     // Chris Nafis (c) 2012
 
     dustDensityMG += (0.172 * calcVoltage - 0.00999);
-    dustDensity+=(calcVoltage-0.0256)*120000; //mg/m^3
+    dustDensity+=(calcVoltage-0.0256)*1200; 
     voltage+=calcVoltage;
     count++;
     delay(1000);
